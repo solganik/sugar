@@ -154,12 +154,23 @@ public class SugarRecord<T>{
                                                                         String whereClause, String... whereArgs) {
         return findAsIterator(type, whereClause, whereArgs, null, null, null);
     }
-
+    
+    public static <T extends SugarRecord<?>> Cursor findAsCursor(Class<T> type,
+            						  String whereClause, String... whereArgs) {
+    	return findAsCursor(type, whereClause, whereArgs, null, null, null);
+    }
+    
     public static <T extends SugarRecord<?>> Iterator<T> findWithQueryAsIterator(Class<T> type, String query, String... arguments) {
         Database db = getSugarContext().getDatabase();
         SQLiteDatabase sqLiteDatabase = db.getDB();
         Cursor c = sqLiteDatabase.rawQuery(query, arguments);
         return new CursorIterator<T>(type, c);
+    }
+    
+    public static <T extends SugarRecord<?>> Cursor findWithQueryAsCursor(Class<T> type, String query, String... arguments) {
+        Database db = getSugarContext().getDatabase();
+        SQLiteDatabase sqLiteDatabase = db.getDB();
+        return sqLiteDatabase.rawQuery(query, arguments);
     }
 
     public static <T extends SugarRecord<?>> Iterator<T> findAsIterator(Class<T> type,
@@ -172,6 +183,17 @@ public class SugarRecord<T>{
                 whereClause, whereArgs, groupBy, null, orderBy, limit);
         return new CursorIterator<T>(type, c);
     }
+    
+    public static <T extends SugarRecord<?>> Cursor findAsCursor(Class<T> type,
+            String whereClause, String[] whereArgs,
+            String groupBy, String orderBy, String limit) {
+
+		Database db = getSugarContext().getDatabase();
+		SQLiteDatabase sqLiteDatabase = db.getDB();
+		return sqLiteDatabase.query(getTableName(type), null,
+		whereClause, whereArgs, groupBy, null, orderBy, limit);		
+    }
+    
 
     public static <T extends SugarRecord<?>> List<T> find(Class<T> type,
                                                        String whereClause, String... whereArgs) {
@@ -265,7 +287,7 @@ public class SugarRecord<T>{
     }
 
     @SuppressWarnings("unchecked")
-    void inflate(Cursor cursor) {
+    protected void inflate(Cursor cursor) {
         Map<Field, Long> entities = new HashMap<Field, Long>();
         List<Field> columns = getTableFields();
         for (Field field : columns) {
