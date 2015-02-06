@@ -2,6 +2,10 @@ package com.orm;
 
 public class StringUtil {
     public static String toSQLName(String javaNotation) {
+
+            if(javaNotation.equalsIgnoreCase("id"))
+                return "ID";
+
             if(javaNotation.equalsIgnoreCase("_id"))
                     return "_id";
 
@@ -32,7 +36,6 @@ public class StringUtil {
                     }
             }
 
-            //escaping
             sb.insert(0, "`");
             sb.append("`");
             return sb.toString();
