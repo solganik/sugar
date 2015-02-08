@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
+
 import com.orm.dsl.Ignore;
 
 import java.lang.reflect.Constructor;
@@ -24,11 +26,11 @@ public class SugarRecord<T>{
     @Ignore
     String tableName = getSqlName();
 
-    protected Long id = null;
+    protected Long _id = null;
 
     public void delete() {
         SQLiteDatabase db = getSugarContext().getDatabase().getDB();
-        db.delete(this.tableName, "Id=?", new String[]{getId().toString()});
+        db.delete(this.tableName, BaseColumns._ID + " =?", new String[]{getId().toString()});
     }
 
     public static <T extends SugarRecord<?>> void deleteAll(Class<T> type) {
@@ -85,7 +87,7 @@ public class SugarRecord<T>{
                 if (SugarRecord.class.isAssignableFrom(columnType)) {
                     values.put(columnName,
                             (columnValue != null)
-                                    ? String.valueOf(((SugarRecord) columnValue).id)
+                                    ? String.valueOf(((SugarRecord) columnValue)._id)
                                     : "0");
                 } else {
                     if (columnType.equals(Short.class) || columnType.equals(short.class)) {
@@ -126,10 +128,10 @@ public class SugarRecord<T>{
             }
         }
 
-        id = db.insertWithOnConflict(getSqlName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        _id = db.insertWithOnConflict(getSqlName(), null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
-        Log.i("Sugar", getClass().getSimpleName() + " saved : " + id);
-        return id;
+        Log.i("Sugar", getClass().getSimpleName() + " saved : " + _id);
+        return _id;
     }
 
     public static <T extends SugarRecord<?>> List<T> listAll(Class<T> type) {
@@ -137,7 +139,7 @@ public class SugarRecord<T>{
     }
 
     public static <T extends SugarRecord<?>> T findById(Class<T> type, Long id) {
-        List<T> list = find( type, "id=?", new String[]{String.valueOf(id)}, null, null, "1");
+        List<T> list = find( type, "_id=?", new String[]{String.valueOf(id)}, null, null, "1");
         if (list.isEmpty()) return null;
         return list.get(0);
     }
@@ -302,7 +304,7 @@ public class SugarRecord<T>{
                     continue;
                 }
 
-                if(colName.equalsIgnoreCase("id")){
+                if(colName.equalsIgnoreCase("_id")){
                     long cid = cursor.getLong(columnIndex);
                     field.set(this, Long.valueOf(cid));
                 }else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
@@ -416,11 +418,11 @@ public class SugarRecord<T>{
     }
 
     public Long getId() {
-        return id;
+        return _id;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this._id = id;
     }
 
     static class CursorIterator<E extends SugarRecord<?>> implements Iterator<E> {

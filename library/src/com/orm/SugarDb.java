@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.orm.dsl.NotNull;
@@ -160,7 +161,7 @@ public class SugarDb extends SQLiteOpenHelper {
         Log.i("Sugar", "create table");
         List<Field> fields = table.getTableFields();
         StringBuilder sb = new StringBuilder("CREATE TABLE ").append(table.getSqlName()).append(
-                " ( ID INTEGER PRIMARY KEY AUTOINCREMENT ");
+                " ( ").append(BaseColumns._ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT ");
 
         for (Field column : fields) {
             String columnName = StringUtil.toSQLName(column.getName());
@@ -168,7 +169,7 @@ public class SugarDb extends SQLiteOpenHelper {
 
             if (columnType != null) {
 
-                if (columnName.equalsIgnoreCase("Id")) {
+                if (columnName.equalsIgnoreCase("_Id")) {
                     continue;
                 }
                 sb.append(", ").append(columnName).append(" ").append(columnType);
